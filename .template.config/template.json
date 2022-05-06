@@ -1,0 +1,33 @@
+{
+  "author": "Azumatt",
+  "classifications": [
+    "Piece Manager Mod"
+  ],
+  "name": "PieceManagerModTemplate",
+  "identity": "Piece.Manager.Mod.Template",
+  "shortName": "pmmt",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "PieceManagerModTemplate",
+  "preferNameDirectory": "true",
+  "symbols": {
+    "AuthorName": {
+      "type": "parameter",
+      "description": "The name of the person that you want to call the author of the mod.",
+      "datatype": "string",
+      "defaultValue": "azumatt",
+      "replaces": "{azumatt}"
+    }
+  },
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "exclude": [ ".git/**", ".idea/**", ".vs/**", "obj/**", "bin/**", "PieceManagerModTemplate.sln", "PieceManagerModTemplate.sln.DotSettings.user" ]
+        }
+      ]
+    }
+  ]
+}
