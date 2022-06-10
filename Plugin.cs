@@ -39,12 +39,14 @@ namespace PieceManagerModTemplate
             examplePiece1.Description.English("Ward For testing the Piece Manager");
             examplePiece1.RequiredItems.Add("FineWood", 20, false); // Set the required items to build. Format: ("PrefabName", Amount, Recoverable)
             examplePiece1.RequiredItems.Add("SurtlingCore", 20, false);
+            examplePiece1.Category.Add(BuildPieceCategory.Misc); // Set a hammer category for the build piece. At this time, this is required.
 
 
             BuildPiece examplePiece2 = new("bamboo", "Bamboo_Wall"); // Note: If you wish to use the default "assets" folder for your assets, you can omit it!
             examplePiece2.Name.English("Bamboo Wall");
             examplePiece2.Description.English("A wall made of bamboo!");
             examplePiece2.RequiredItems.Add("BambooLog", 20, false);
+            examplePiece2.Category.Add(BuildPieceCategory.Building);
 
 
             // If you want to add your item to the cultivator or another hammer with vanilla categories
