@@ -97,7 +97,7 @@ namespace PieceManagerExampleMod
             PiecePrefabManager.RegisterPrefab("bamboo", "Bamboo_Beam_Light");
             
             // Does your model need to swap materials with a vanilla material? Format: (GameObject, isJotunnMock)
-            MaterialReplacer.RegisterGameObjectForMatSwap(examplePiece3, false);
+            MaterialReplacer.RegisterGameObjectForMatSwap(examplePiece3.Prefab, false);
         }
     }
 }
