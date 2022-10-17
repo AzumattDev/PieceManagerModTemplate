@@ -27,14 +27,16 @@ namespace PieceManager
             VegetationShader,
             RockShader,
             RugShader,
-            GrassShader
+            GrassShader,
+            CustomCreature,
+            UseUnityShader
         }
 
         private static Dictionary<GameObject, bool> _objectToSwap;
         internal static Dictionary<string, Material> originalMaterials;
         private static Dictionary<GameObject, ShaderType> _objectsForShaderReplace;
 
-        public static void RegisterGameObjectForShaderSwap(GameObject go, ShaderType type = ShaderType.PieceShader)
+        public static void RegisterGameObjectForShaderSwap(GameObject go, ShaderType type)
         {
             _objectsForShaderReplace?.Add(go, type);
         }
@@ -109,9 +111,11 @@ namespace PieceManager
             foreach (Renderer? renderer in _objectsForShaderReplace.SelectMany(gameObject =>
                          gameObject.Key.GetComponentsInChildren<Renderer>(true)))
             {
-                _objectsForShaderReplace.TryGetValue(renderer.gameObject, out ShaderType shaderType);
-                foreach (Material? t in renderer.materials)
+                _objectsForShaderReplace.TryGetValue(renderer.gameObject.transform.root.gameObject,
+                    out ShaderType shaderType);
+                foreach (Material? t in renderer.sharedMaterials)
                 {
+                    string name = t.shader.name;
                     switch (shaderType)
                     {
                         case ShaderType.PieceShader:
@@ -128,6 +132,12 @@ namespace PieceManager
                             break;
                         case ShaderType.GrassShader:
                             t.shader = Shader.Find("Custom/Grass");
+                            break;
+                        case ShaderType.CustomCreature:
+                            t.shader = Shader.Find("Custom/Creature");
+                            break;
+                        case ShaderType.UseUnityShader:
+                            t.shader = Shader.Find(name);
                             break;
                         default:
                             t.shader = Shader.Find("ToonDeferredShading2017");

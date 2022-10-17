@@ -72,6 +72,14 @@ namespace PieceManagerModTemplate
             
             // Does your model need to swap materials with a vanilla material? Format: (GameObject, isJotunnMock)
             MaterialReplacer.RegisterGameObjectForMatSwap(examplePiece3.Prefab, false);
+            
+            // Does your model use a shader from the game like Custom/Creature or Custom/Piece in unity? Need it to "just work"?
+            //MaterialReplacer.RegisterGameObjectForShaderSwap(examplePiece3.Prefab, MaterialReplacer.ShaderType.UseUnityShader);
+            
+            // What if you want to use a custom shader from the game (like Custom/Piece that allows snow!!!) but your unity shader isn't set to Custom/Piece? Format: (GameObject, MaterialReplacer.ShaderType.)
+            //MaterialReplacer.RegisterGameObjectForShaderSwap(examplePiece3.Prefab, MaterialReplacer.ShaderType.PieceShader);
+
+            // Detailed instructions on how to use the MaterialReplacer can be found on the current PieceManager Wiki. https://github.com/AzumattDev/PieceManager/wiki
 
             Assembly assembly = Assembly.GetExecutingAssembly();
             _harmony.PatchAll(assembly);
