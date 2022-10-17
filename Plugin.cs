@@ -44,6 +44,11 @@ namespace PieceManagerModTemplate
             examplePiece1.RequiredItems.Add("SurtlingCore", 20, false);
             examplePiece1.Category.Add(BuildPieceCategory.Misc);
             examplePiece1.Crafting.Set(CraftingTable.ArtisanTable); // Set a crafting station requirement for the piece.
+            examplePiece1.Extension.Set(CraftingTable.Forge, 2); // Makes this piece a station extension, can change the max station distance by changing the second value. Use strings for custom tables.
+            
+            // Or you can do it for a custom table (### Default maxStationDistance is 5. I used 2 as an example here.)
+            examplePiece1.Extension.Set("MYCUSTOMTABLE", 2); // Makes this piece a station extension, can change the max station distance by changing the second value. Use strings for custom tables.
+            
             //examplePiece1.Crafting.Set("CUSTOMTABLE"); // If you have a custom table you're adding to the game. Just set it like this.
 
             //examplePiece1.SpecialProperties.NoConfig = true;  // Do not generate a config for this piece, omit this line of code if you want to generate a config.
