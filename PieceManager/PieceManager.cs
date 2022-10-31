@@ -418,7 +418,7 @@ public class BuildPiece
                 {
                     ConfigurationManagerAttributes attributes = new()
                         { CustomDrawer = DrawConfigTable, Order = --order, Category = localizedName };
-                    return config(localizedName, name, value, new ConfigDescription(desc, null, attributes));
+                    return config(englishName, name, value, new ConfigDescription(desc, null, attributes));
                 }
 
                 cfg.craft = itemConfig("Crafting Costs",
