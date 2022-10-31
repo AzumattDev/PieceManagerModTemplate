@@ -27,9 +27,16 @@ namespace PieceManagerModTemplate
         private static readonly ConfigSync ConfigSync = new(ModGUID)
             { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
 
+        public enum Toggle
+        {
+            On = 1,
+            Off = 0
+        }
+
         public void Awake()
         {
-            _serverConfigLocked = config("General", "Force Server Config", true, "Force Server Config");
+            _serverConfigLocked = config("1 - General", "Lock Configuration", Toggle.On,
+                "If on, the configuration is locked and can be changed by server admins only.");
             _ = ConfigSync.AddLockingConfigEntry(_serverConfigLocked);
 
             // Globally turn off configuration options for your pieces, omit if you don't want to do this.
@@ -125,7 +132,7 @@ namespace PieceManagerModTemplate
 
         #region ConfigOptions
 
-        private static ConfigEntry<bool>? _serverConfigLocked;
+        private static ConfigEntry<Toggle> _serverConfigLocked = null!;
 
         private ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description,
             bool synchronizedSetting = true)
