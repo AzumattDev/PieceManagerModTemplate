@@ -97,6 +97,9 @@ namespace PieceManagerExampleMod
             examplePiece3.Description.English("A young bamboo tree, called a sapling");
             examplePiece3.RequiredItems.Add("BambooSeed", 20, false);
             examplePiece3.SpecialProperties.NoConfig = true;
+            
+            // If you don't want to make an icon inside unity, but want the PieceManager to snag one for you, simply add .Snapshot() to your piece.
+            examplePiece3.Snapshot(); // Optionally, you can use the lightIntensity parameter to set the light intensity of the snapshot. Default is 1.3 or the cameraRotation parameter to set the rotation of the camera. Default is null.
 
             // Need to add something to ZNetScene but not the hammer, cultivator or other? 
             PiecePrefabManager.RegisterPrefab("bamboo", "Bamboo_Beam_Light");
