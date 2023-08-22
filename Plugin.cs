@@ -47,55 +47,68 @@ namespace PieceManagerModTemplate
 
             // Globally turn off configuration options for your pieces, omit if you don't want to do this.
             BuildPiece.ConfigurationEnabled = false;
-            
+
             // Format: new("AssetBundleName", "PrefabName", "FolderName");
             BuildPiece examplePiece1 = new("funward", "funward", "FunWard");
             examplePiece1.Name.English("Fun Ward"); // Localize the name and description for the building piece for a language.
             examplePiece1.Description.English("Ward For testing the Piece Manager");
             examplePiece1.RequiredItems.Add("FineWood", 20, false); // Set the required items to build. Format: ("PrefabName", Amount, Recoverable)
             examplePiece1.RequiredItems.Add("SurtlingCore", 20, false);
-            examplePiece1.Category.Add(PieceManager.BuildPieceCategory.Misc);
+            examplePiece1.Category.Set(PieceManager.BuildPieceCategory.Misc);
             examplePiece1.Crafting.Set(PieceManager.CraftingTable.ArtisanTable); // Set a crafting station requirement for the piece.
             //examplePiece1.Extension.Set(CraftingTable.Forge, 2); // Makes this piece a station extension, can change the max station distance by changing the second value. Use strings for custom tables.
-            
+
             // Or you can do it for a custom table (### Default maxStationDistance is 5. I used 2 as an example here.)
             //examplePiece1.Extension.Set("MYCUSTOMTABLE", 2); // Makes this piece a station extension, can change the max station distance by changing the second value. Use strings for custom tables.
-            
+
             //examplePiece1.Crafting.Set("CUSTOMTABLE"); // If you have a custom table you're adding to the game. Just set it like this.
 
             //examplePiece1.SpecialProperties.NoConfig = true;  // Do not generate a config for this piece, omit this line of code if you want to generate a config.
-            examplePiece1.SpecialProperties = new SpecialProperties() { AdminOnly = true, NoConfig = true}; // You can declare multiple properties in one line           
+            examplePiece1.SpecialProperties = new SpecialProperties() { AdminOnly = true, NoConfig = true }; // You can declare multiple properties in one line           
 
 
             BuildPiece examplePiece2 = new("bamboo", "Bamboo_Wall"); // Note: If you wish to use the default "assets" folder for your assets, you can omit it!
             examplePiece2.Name.English("Bamboo Wall");
             examplePiece2.Description.English("A wall made of bamboo!");
             examplePiece2.RequiredItems.Add("BambooLog", 20, false);
-            examplePiece2.Category.Add(PieceManager.BuildPieceCategory.Building);
+            examplePiece2.Category.Set(PieceManager.BuildPieceCategory.Building);
             examplePiece2.Crafting.Set("CUSTOMTABLE"); // If you have a custom table you're adding to the game. Just set it like this.
-            examplePiece2.SpecialProperties.AdminOnly = true;  // You can declare these one at a time as well!.
+            examplePiece2.SpecialProperties.AdminOnly = true; // You can declare these one at a time as well!.
 
 
             // If you want to add your item to the cultivator or another hammer with vanilla categories
             // Format: (AssetBundle, "PrefabName", addToCustom, "Item that has a piecetable")
-            BuildPiece examplePiece3 = new(PiecePrefabManager.RegisterAssetBundle("bamboo"), "Bamboo_Sapling", true, "Cultivator");
+            BuildPiece examplePiece3 = new("bamboo", "Bamboo_Sapling");
             examplePiece3.Name.English("Bamboo Sapling");
             examplePiece3.Description.English("A young bamboo tree, called a sapling");
             examplePiece3.RequiredItems.Add("BambooSeed", 20, false);
+            examplePiece3.Tool.Add("Cultivator"); // Format: ("Item that has a piecetable")
             examplePiece3.SpecialProperties.NoConfig = true;
-            
+
             // If you don't want to make an icon inside unity, but want the PieceManager to snag one for you, simply add .Snapshot() to your piece.
             examplePiece3.Snapshot(); // Optionally, you can use the lightIntensity parameter to set the light intensity of the snapshot. Default is 1.3 or the cameraRotation parameter to set the rotation of the camera. Default is null.
 
+            // If you want a more custom piece, below is an example. Including custom category and custom crafting station. Also adding to a custom hammer.
+            BuildPiece examplePiece4 = new("bamboo", "Bamboo_Beam_Light");
+            examplePiece4.Name.English("Bamboo Beam Light");
+            examplePiece4.Description.English("A light made of bamboo!");
+            examplePiece4.RequiredItems.Add("BambooLog", 20, false);
+            examplePiece4.Category.Set("Custom Category");
+            examplePiece4.Crafting.Set("CUSTOMTABLE");
+            examplePiece4.Tool.Add("Custom Hammer");
+            examplePiece4.SpecialProperties.NoConfig = true;
+            examplePiece4.Snapshot(); // Optionally, you can use the lightIntensity parameter to set the light intensity of the snapshot. Default is 1.3 or the cameraRotation parameter to set the rotation of the camera. Default is null.
+
+
             // Need to add something to ZNetScene but not the hammer, cultivator or other? 
             PiecePrefabManager.RegisterPrefab("bamboo", "Bamboo_Beam_Light");
-            
+
             // Does your model need to swap materials with a vanilla material? Format: (GameObject, isJotunnMock)
             MaterialReplacer.RegisterGameObjectForMatSwap(examplePiece3.Prefab, false);
-            
+
             // Does your model use a shader from the game like Custom/Creature or Custom/Piece in unity? Need it to "just work"?
             //MaterialReplacer.RegisterGameObjectForShaderSwap(examplePiece3.Prefab, MaterialReplacer.ShaderType.UseUnityShader);
-            
+
             // What if you want to use a custom shader from the game (like Custom/Piece that allows snow!!!) but your unity shader isn't set to Custom/Piece? Format: (GameObject, MaterialReplacer.ShaderType.)
             //MaterialReplacer.RegisterGameObjectForShaderSwap(examplePiece3.Prefab, MaterialReplacer.ShaderType.PieceShader);
 
@@ -167,10 +180,23 @@ namespace PieceManagerModTemplate
 
         private class ConfigurationManagerAttributes
         {
-            [UsedImplicitly] public int? Order;
-            [UsedImplicitly] public bool? Browsable;
-            [UsedImplicitly] public string? Category;
-            [UsedImplicitly] public Action<ConfigEntryBase>? CustomDrawer;
+            [UsedImplicitly] public int? Order = null!;
+            [UsedImplicitly] public bool? Browsable = null!;
+            [UsedImplicitly] public string? Category = null!;
+            [UsedImplicitly] public Action<ConfigEntryBase>? CustomDrawer = null!;
+        }
+
+        class AcceptableShortcuts : AcceptableValueBase
+        {
+            public AcceptableShortcuts() : base(typeof(KeyboardShortcut))
+            {
+            }
+
+            public override object Clamp(object value) => value;
+            public override bool IsValid(object value) => true;
+
+            public override string ToDescriptionString() =>
+                "# Acceptable values: " + string.Join(", ", UnityInput.Current.SupportedKeyCodes);
         }
 
         #endregion

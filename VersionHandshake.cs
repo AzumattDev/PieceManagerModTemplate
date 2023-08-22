@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using HarmonyLib;
 
 namespace PieceManagerModTemplate
@@ -18,6 +22,7 @@ namespace PieceManagerModTemplate
             PieceManagerModTemplatePlugin.PieceManagerModTemplateLogger.LogInfo("Invoking version check");
             ZPackage zpackage = new();
             zpackage.Write(PieceManagerModTemplatePlugin.ModVersion);
+            zpackage.Write(RpcHandlers.ComputeHashForMod().Replace("-", ""));
             peer.m_rpc.Invoke($"{PieceManagerModTemplatePlugin.ModName}_VersionCheck", zpackage);
         }
     }
@@ -29,15 +34,14 @@ namespace PieceManagerModTemplate
         {
             if (!__instance.IsServer() || RpcHandlers.ValidatedPeers.Contains(rpc)) return true;
             // Disconnect peer if they didn't send mod version at all
-            PieceManagerModTemplatePlugin.PieceManagerModTemplateLogger.LogWarning(
-                $"Peer ({rpc.m_socket.GetHostName()}) never sent version or couldn't due to previous disconnect, disconnecting");
+            PieceManagerModTemplatePlugin.PieceManagerModTemplateLogger.LogWarning($"Peer ({rpc.m_socket.GetHostName()}) never sent version or couldn't due to previous disconnect, disconnecting");
             rpc.Invoke("Error", 3);
             return false; // Prevent calling underlying method
         }
 
         private static void Postfix(ZNet __instance)
         {
-            ZRoutedRpc.instance.InvokeRoutedRPC(ZRoutedRpc.instance.GetServerPeerID(), "RequestAdminSync",
+            ZRoutedRpc.instance.InvokeRoutedRPC(ZRoutedRpc.instance.GetServerPeerID(), $"{PieceManagerModTemplatePlugin.ModName}RequestAdminSync",
                 new ZPackage());
         }
     }
@@ -76,17 +80,18 @@ namespace PieceManagerModTemplate
         public static void RPC_PieceManagerModTemplate_Version(ZRpc rpc, ZPackage pkg)
         {
             string? version = pkg.ReadString();
+            string? hash = pkg.ReadString();
+
+            var hashForAssembly = ComputeHashForMod().Replace("-", "");
             PieceManagerModTemplatePlugin.PieceManagerModTemplateLogger.LogInfo("Version check, local: " +
-                                                                   PieceManagerModTemplatePlugin.ModVersion +
-                                                                   ",  remote: " + version);
-            if (version != PieceManagerModTemplatePlugin.ModVersion)
+                                                                                PieceManagerModTemplatePlugin.ModVersion +
+                                                                                ",  remote: " + version);
+            if (hash != hashForAssembly || version != PieceManagerModTemplatePlugin.ModVersion)
             {
-                PieceManagerModTemplatePlugin.ConnectionError =
-                    $"{PieceManagerModTemplatePlugin.ModName} Installed: {PieceManagerModTemplatePlugin.ModVersion}\n Needed: {version}";
+                PieceManagerModTemplatePlugin.ConnectionError = $"{PieceManagerModTemplatePlugin.ModName} Installed: {PieceManagerModTemplatePlugin.ModVersion} {hashForAssembly}\n Needed: {version} {hash}";
                 if (!ZNet.instance.IsServer()) return;
                 // Different versions - force disconnect client from server
-                PieceManagerModTemplatePlugin.PieceManagerModTemplateLogger.LogWarning(
-                    $"Peer ({rpc.m_socket.GetHostName()}) has incompatible version, disconnecting");
+                PieceManagerModTemplatePlugin.PieceManagerModTemplateLogger.LogWarning($"Peer ({rpc.m_socket.GetHostName()}) has incompatible version, disconnecting...");
                 rpc.Invoke("Error", 3);
             }
             else
@@ -99,11 +104,25 @@ namespace PieceManagerModTemplate
                 else
                 {
                     // Add client to validated list
-                    PieceManagerModTemplatePlugin.PieceManagerModTemplateLogger.LogInfo(
-                        $"Adding peer ({rpc.m_socket.GetHostName()}) to validated list");
+                    PieceManagerModTemplatePlugin.PieceManagerModTemplateLogger.LogInfo($"Adding peer ({rpc.m_socket.GetHostName()}) to validated list");
                     ValidatedPeers.Add(rpc);
                 }
             }
+        }
+
+        public static string ComputeHashForMod()
+        {
+            using SHA256 sha256Hash = SHA256.Create();
+            // ComputeHash - returns byte array  
+            byte[] bytes = sha256Hash.ComputeHash(File.ReadAllBytes(Assembly.GetExecutingAssembly().Location));
+            // Convert byte array to a string   
+            StringBuilder builder = new();
+            foreach (byte b in bytes)
+            {
+                builder.Append(b.ToString("X2"));
+            }
+
+            return builder.ToString();
         }
     }
 }
