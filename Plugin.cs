@@ -51,7 +51,7 @@ namespace PieceManagerModTemplate
             BuildPiece.ConfigurationEnabled = false;
 
             // Format: new("AssetBundleName", "PrefabName", "FolderName");
-            BuildPiece examplePiece1 = new("funward", "funward", "FunWard");
+            BuildPiece examplePiece1 = new("funward_bundle", "funward", "FunWard_BundleFolder");
             examplePiece1.Name.English("Fun Ward"); // Localize the name and description for the building piece for a language.
             examplePiece1.Description.English("Ward For testing the Piece Manager");
             examplePiece1.RequiredItems.Add("FineWood", 20, false); // Set the required items to build. Format: ("PrefabName", Amount, Recoverable)
