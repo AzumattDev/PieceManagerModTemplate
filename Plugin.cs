@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
@@ -9,6 +10,7 @@ using JetBrains.Annotations;
 using LocalizationManager;
 using PieceManager;
 using ServerSync;
+using UnityEngine;
 
 namespace PieceManagerModTemplate
 {
@@ -200,5 +202,18 @@ namespace PieceManagerModTemplate
         }
 
         #endregion
+    }
+    
+    public static class KeyboardExtensions
+    {
+        public static bool IsKeyDown(this KeyboardShortcut shortcut)
+        {
+            return shortcut.MainKey != KeyCode.None && Input.GetKeyDown(shortcut.MainKey) && shortcut.Modifiers.All(Input.GetKey);
+        }
+
+        public static bool IsKeyHeld(this KeyboardShortcut shortcut)
+        {
+            return shortcut.MainKey != KeyCode.None && Input.GetKey(shortcut.MainKey) && shortcut.Modifiers.All(Input.GetKey);
+        }
     }
 }
