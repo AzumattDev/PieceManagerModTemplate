@@ -22,7 +22,6 @@ namespace PieceManagerModTemplate
             PieceManagerModTemplatePlugin.PieceManagerModTemplateLogger.LogInfo("Invoking version check");
             ZPackage zpackage = new();
             zpackage.Write(PieceManagerModTemplatePlugin.ModVersion);
-            zpackage.Write(RpcHandlers.ComputeHashForMod().Replace("-", ""));
             peer.m_rpc.Invoke($"{PieceManagerModTemplatePlugin.ModName}_VersionCheck", zpackage);
         }
     }
@@ -80,15 +79,12 @@ namespace PieceManagerModTemplate
         public static void RPC_PieceManagerModTemplate_Version(ZRpc rpc, ZPackage pkg)
         {
             string? version = pkg.ReadString();
-            string? hash = pkg.ReadString();
-
-            var hashForAssembly = ComputeHashForMod().Replace("-", "");
             PieceManagerModTemplatePlugin.PieceManagerModTemplateLogger.LogInfo("Version check, local: " +
                                                                                 PieceManagerModTemplatePlugin.ModVersion +
                                                                                 ",  remote: " + version);
-            if (hash != hashForAssembly || version != PieceManagerModTemplatePlugin.ModVersion)
+            if (version != PieceManagerModTemplatePlugin.ModVersion)
             {
-                PieceManagerModTemplatePlugin.ConnectionError = $"{PieceManagerModTemplatePlugin.ModName} Installed: {PieceManagerModTemplatePlugin.ModVersion} {hashForAssembly}\n Needed: {version} {hash}";
+                PieceManagerModTemplatePlugin.ConnectionError = $"{PieceManagerModTemplatePlugin.ModName} Installed: {PieceManagerModTemplatePlugin.ModVersion}\n Needed: {version}";
                 if (!ZNet.instance.IsServer()) return;
                 // Different versions - force disconnect client from server
                 PieceManagerModTemplatePlugin.PieceManagerModTemplateLogger.LogWarning($"Peer ({rpc.m_socket.GetHostName()}) has incompatible version, disconnecting...");
@@ -108,21 +104,6 @@ namespace PieceManagerModTemplate
                     ValidatedPeers.Add(rpc);
                 }
             }
-        }
-
-        public static string ComputeHashForMod()
-        {
-            using SHA256 sha256Hash = SHA256.Create();
-            // ComputeHash - returns byte array  
-            byte[] bytes = sha256Hash.ComputeHash(File.ReadAllBytes(Assembly.GetExecutingAssembly().Location));
-            // Convert byte array to a string   
-            StringBuilder builder = new();
-            foreach (byte b in bytes)
-            {
-                builder.Append(b.ToString("X2"));
-            }
-
-            return builder.ToString();
         }
     }
 }
