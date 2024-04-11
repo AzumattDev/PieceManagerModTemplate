@@ -15,8 +15,7 @@ namespace PieceManagerModTemplate
         {
             // Register version check call
             PieceManagerModTemplatePlugin.PieceManagerModTemplateLogger.LogDebug("Registering version RPC handler");
-            peer.m_rpc.Register($"{PieceManagerModTemplatePlugin.ModName}_VersionCheck",
-                new Action<ZRpc, ZPackage>(RpcHandlers.RPC_PieceManagerModTemplate_Version));
+            peer.m_rpc.Register($"{PieceManagerModTemplatePlugin.ModName}_VersionCheck", new Action<ZRpc, ZPackage>(RpcHandlers.RPC_PieceManagerModTemplate_Version));
 
             // Make calls to check versions
             PieceManagerModTemplatePlugin.PieceManagerModTemplateLogger.LogInfo("Invoking version check");
@@ -40,8 +39,7 @@ namespace PieceManagerModTemplate
 
         private static void Postfix(ZNet __instance)
         {
-            ZRoutedRpc.instance.InvokeRoutedRPC(ZRoutedRpc.instance.GetServerPeerID(), $"{PieceManagerModTemplatePlugin.ModName}RequestAdminSync",
-                new ZPackage());
+            ZRoutedRpc.instance.InvokeRoutedRPC(ZRoutedRpc.instance.GetServerPeerID(), $"{PieceManagerModTemplatePlugin.ModName}RequestAdminSync", new ZPackage());
         }
     }
 
@@ -66,8 +64,7 @@ namespace PieceManagerModTemplate
         {
             if (!__instance.IsServer()) return;
             // Remove peer from validated list
-            PieceManagerModTemplatePlugin.PieceManagerModTemplateLogger.LogInfo(
-                $"Peer ({peer.m_rpc.m_socket.GetHostName()}) disconnected, removing from validated list");
+            PieceManagerModTemplatePlugin.PieceManagerModTemplateLogger.LogInfo($"Peer ({peer.m_rpc.m_socket.GetHostName()}) disconnected, removing from validated list");
             _ = RpcHandlers.ValidatedPeers.Remove(peer.m_rpc);
         }
     }
@@ -79,9 +76,7 @@ namespace PieceManagerModTemplate
         public static void RPC_PieceManagerModTemplate_Version(ZRpc rpc, ZPackage pkg)
         {
             string? version = pkg.ReadString();
-            PieceManagerModTemplatePlugin.PieceManagerModTemplateLogger.LogInfo("Version check, local: " +
-                                                                                PieceManagerModTemplatePlugin.ModVersion +
-                                                                                ",  remote: " + version);
+            PieceManagerModTemplatePlugin.PieceManagerModTemplateLogger.LogInfo("Version check, local: " + PieceManagerModTemplatePlugin.ModVersion + ",  remote: " + version);
             if (version != PieceManagerModTemplatePlugin.ModVersion)
             {
                 PieceManagerModTemplatePlugin.ConnectionError = $"{PieceManagerModTemplatePlugin.ModName} Installed: {PieceManagerModTemplatePlugin.ModVersion}\n Needed: {version}";
