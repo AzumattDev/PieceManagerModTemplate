@@ -26,8 +26,8 @@ following content into the file
     <Target Name="ILRepacker" AfterTargets="Build">
         <ItemGroup>
             <InputAssemblies Include="$(TargetPath)"/>
-            <InputAssemblies Include="$(OutputPath)\PieceManager.dll"/>
-            <InputAssemblies Include="$(OutputPath)\ServerSync.dll"/>
+            <InputAssemblies Include="$(OutputPath)Libs\PieceManager.dll"/>
+            <InputAssemblies Include="$(OutputPath)Libs\ServerSync.dll"/>
         </ItemGroup>
         <ILRepack Parallel="true" DebugInfo="true" Internalize="true" InputAssemblies="@(InputAssemblies)"
                   OutputFile="$(TargetPath)" TargetKind="SameAsPrimaryAssembly" LibraryPath="$(OutputPath)"/>
@@ -87,7 +87,7 @@ namespace PieceManagerExampleMod
             examplePiece2.Name.English("Bamboo Wall");
             examplePiece2.Description.English("A wall made of bamboo!");
             examplePiece2.RequiredItems.Add("BambooLog", 20, false);
-            examplePiece2.Category.Add(BuildPieceCategory.Building);
+            examplePiece2.Category.Add(BuildPieceCategory.BuildingWorkbench);
             examplePiece2.Crafting.Set("CUSTOMTABLE"); // If you have a custom table you're adding to the game. Just set it like this.
             examplePiece2.SpecialProperties.AdminOnly = true;  // You can declare these one at a time as well!.
 

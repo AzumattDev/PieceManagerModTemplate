@@ -25,12 +25,8 @@ namespace PieceManagerModTemplate
         private static string ConfigFileFullPath = Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
         internal static string ConnectionError = "";
         private readonly Harmony _harmony = new(ModGUID);
-
-        public static readonly ManualLogSource PieceManagerModTemplateLogger =
-            BepInEx.Logging.Logger.CreateLogSource(ModName);
-
-        private static readonly ConfigSync ConfigSync = new(ModGUID)
-            { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
+        public static readonly ManualLogSource PieceManagerModTemplateLogger = BepInEx.Logging.Logger.CreateLogSource(ModName);
+        private static readonly ConfigSync ConfigSync = new(ModGUID) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
 
         public enum Toggle
         {
@@ -72,7 +68,7 @@ namespace PieceManagerModTemplate
             examplePiece2.Name.English("Bamboo Wall");
             examplePiece2.Description.English("A wall made of bamboo!");
             examplePiece2.RequiredItems.Add("BambooLog", 20, false);
-            examplePiece2.Category.Set(PieceManager.BuildPieceCategory.Building);
+            examplePiece2.Category.Set(PieceManager.BuildPieceCategory.BuildingWorkbench);
             examplePiece2.Crafting.Set("CUSTOMTABLE"); // If you have a custom table you're adding to the game. Just set it like this.
             examplePiece2.SpecialProperties.AdminOnly = true; // You can declare these one at a time as well!.
 
