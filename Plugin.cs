@@ -27,7 +27,12 @@ namespace PieceManagerModTemplate
         private readonly Harmony _harmony = new(ModGUID);
         public static readonly ManualLogSource PieceManagerModTemplateLogger = BepInEx.Logging.Logger.CreateLogSource(ModName);
         private static readonly ConfigSync ConfigSync = new(ModGUID) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
-
+        private FileSystemWatcher _watcher;
+        private readonly object _reloadLock = new();
+        private DateTime _lastConfigReloadTime;
+        private const long RELOAD_DELAY = 10000000; // One second
+        
+        
         public enum Toggle
         {
             On = 1,
@@ -36,6 +41,9 @@ namespace PieceManagerModTemplate
 
         public void Awake()
         {
+            bool saveOnSet = Config.SaveOnConfigSet;
+            Config.SaveOnConfigSet = false;
+            
             // Uncomment the line below to use the LocalizationManager for localizing your mod.
             //Localizer.Load(); // Use this to initialize the LocalizationManager (for more information on LocalizationManager, see the LocalizationManager documentation https://github.com/blaxxun-boop/LocalizationManager#example-project).
 
@@ -114,11 +122,18 @@ namespace PieceManagerModTemplate
             Assembly assembly = Assembly.GetExecutingAssembly();
             _harmony.PatchAll(assembly);
             SetupWatcher();
+            
+            Config.Save();
+            if (saveOnSet)
+            {
+                Config.SaveOnConfigSet = saveOnSet;
+            }
         }
 
         private void OnDestroy()
         {
-            Config.Save();
+            SaveWithRespectToConfigSet();
+            _watcher?.Dispose();
         }
 
         private void SetupWatcher()
@@ -134,20 +149,49 @@ namespace PieceManagerModTemplate
 
         private void ReadConfigValues(object sender, FileSystemEventArgs e)
         {
-            if (!File.Exists(ConfigFileFullPath)) return;
-            try
+            DateTime now = DateTime.Now;
+            long time = now.Ticks - _lastConfigReloadTime.Ticks;
+            if (time < RELOAD_DELAY)
             {
-                PieceManagerModTemplateLogger.LogDebug("ReadConfigValues called");
-                Config.Reload();
+                return;
             }
-            catch
+
+            lock (_reloadLock)
             {
-                PieceManagerModTemplateLogger.LogError($"There was an issue loading your {ConfigFileName}");
-                PieceManagerModTemplateLogger.LogError("Please check your config entries for spelling and format!");
+                if (!File.Exists(ConfigFileFullPath))
+                {
+                    PieceManagerModTemplateLogger.LogWarning("Config file does not exist. Skipping reload.");
+                    return;
+                }
+
+                try
+                {
+                    PieceManagerModTemplateLogger.LogDebug("Reloading configuration...");
+                    SaveWithRespectToConfigSet(true);
+                    PieceManagerModTemplateLogger.LogInfo("Configuration reload complete.");
+                }
+                catch (Exception ex)
+                {
+                    PieceManagerModTemplateLogger.LogError($"Error reloading configuration: {ex.Message}");
+                }
+            }
+
+            _lastConfigReloadTime = now;
+        }
+        
+        private void SaveWithRespectToConfigSet(bool reload = false)
+        {
+            bool originalSaveOnSet = Config.SaveOnConfigSet;
+            Config.SaveOnConfigSet = false;
+            if (reload)
+                Config.Reload();
+            Config.Save();
+            if (originalSaveOnSet)
+            {
+                Config.SaveOnConfigSet = originalSaveOnSet;
             }
         }
-
-
+        
         #region ConfigOptions
 
         private static ConfigEntry<Toggle> _serverConfigLocked = null!;
