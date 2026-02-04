@@ -112,13 +112,19 @@ namespace PieceManager
             var renderers = go.GetComponentsInChildren<Renderer>(true);
             foreach (var renderer in renderers)
             {
-                var newMaterials = renderer.sharedMaterials.Select(material => ReplaceMaterial(material, isJotunnMock)).ToArray();
+                var newMaterials = renderer.sharedMaterials.Select(material => material == null ? null : ReplaceMaterial(material, isJotunnMock)).ToArray();
                 renderer.sharedMaterials = newMaterials;
             }
         }
 
         private static Material ReplaceMaterial(Material originalMaterial, bool isJotunnMock)
         {
+            // Additional null check in case 'originalMaterial' somehow is null:
+            if (originalMaterial == null)
+            {
+                return null;
+            }
+
             string replacementPrefix = isJotunnMock ? "JVLmock_" : "_REPLACE_";
             if (!originalMaterial.name.StartsWith(replacementPrefix, StringComparison.Ordinal))
             {
