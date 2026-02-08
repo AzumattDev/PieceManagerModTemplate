@@ -46,6 +46,7 @@ namespace PieceManager
 
         public static void RegisterGameObjectForMatSwap(GameObject go, bool isJotunnMock = false)
         {
+            if (go == null) return;
             if (!ObjectToSwap.ContainsKey(go))
             {
                 ObjectToSwap.Add(go, isJotunnMock);
